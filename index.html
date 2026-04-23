@@ -1,63 +1,479 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EMG Monitoring Dashboard</title>
-    <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>NeuroSync EMG – Advanced Rehabilitation Monitoring Platform</title>
+  <meta name="description" content="NeuroSync EMG is a professional hospital-grade EMG monitoring platform for real-time muscle activity tracking, patient management, and rehabilitation progress."/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css"/>
 </head>
 <body>
-    <!-- Navigation Bar -->
-    <nav class="navbar">
-        <h1>EMG Monitoring System</h1>
-        <ul>
-            <li><a href="#">Home</a></li>
-            <li><a href="#">Reports</a></li>
-            <li><a href="#">Settings</a></li>
-        </ul>
-    </nav>
-    
-    <!-- Main Dashboard -->
-    <div class="dashboard">
-        <!-- Patient Sidebar -->
-        <aside class="patient-sidebar">
-            <h2>Patient Information</h2>
-            <div class="patient-card">
-                <p><strong>Name:</strong> John Doe</p>
-                <p><strong>Age:</strong> 30</p>
-                <p><strong>Condition:</strong> Healthy</p>
-            </div>
-        </aside>
-        
-        <!-- Real-time EMG Chart -->
-        <section class="emg-chart">
-            <h2>Real-Time EMG Data</h2>
-            <canvas id="emgCanvas"></canvas>
-        </section>
-        
-        <!-- Movement Status Indicator -->
-        <section class="movement-status">
-            <h2>Movement Status</h2>
-            <p id="movementStatus">No Movement Detected</p>
-        </section>
-        
-        <!-- Statistics Grid -->
-        <section class="statistics">
-            <h2>Statistics</h2>
-            <table>
-                <tr><th>Average</th><th>Peak</th><th>Duration</th></tr>
-                <tr><td id="averageValue">0.00</td><td id="peakValue">0.00</td><td id="durationValue">0s</td></tr>
-            </table>
-        </section>
+
+<!-- ==================== LOGIN SCREEN ==================== -->
+<div id="loginScreen" class="login-screen active">
+  <div class="login-bg">
+    <div class="login-orb orb1"></div>
+    <div class="login-orb orb2"></div>
+    <div class="login-orb orb3"></div>
+  </div>
+  <div class="login-container">
+    <div class="login-brand">
+      <div class="brand-icon">
+        <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M5 20 L10 20 L13 10 L17 30 L21 15 L24 25 L27 20 L35 20" stroke="url(#g1)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <defs><linearGradient id="g1" x1="5" y1="20" x2="35" y2="20" gradientUnits="userSpaceOnUse">
+            <stop stop-color="#6366f1"/><stop offset="1" stop-color="#06b6d4"/>
+          </linearGradient></defs>
+        </svg>
+      </div>
+      <h1 class="brand-name">NeuroSync<span>EMG</span></h1>
+      <p class="brand-tagline">Advanced Rehabilitation Monitoring Platform</p>
     </div>
-    
-    <!-- Interactive Controls -->
-    <div class="controls">
-        <button id="refreshButton">Refresh</button>
-        <button id="addReadingButton">Add Reading</button>
-        <button id="clearDataButton">Clear Data</button>
+    <div class="login-card">
+      <div class="login-tabs">
+        <button class="login-tab active" id="doctorTabBtn" onclick="switchLoginTab('doctor')">🩺 Doctor</button>
+        <button class="login-tab" id="patientTabBtn" onclick="switchLoginTab('patient')">👤 Patient</button>
+      </div>
+      <div class="login-form">
+        <div class="form-group">
+          <label>Username</label>
+          <input type="text" id="loginUsername" placeholder="Enter username" autocomplete="username"/>
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="loginPassword" placeholder="Enter password" autocomplete="current-password"/>
+        </div>
+        <div class="login-hint" id="loginHint">
+          <span>Demo: <b>doctor</b> / <b>1234</b></span>
+        </div>
+        <button class="btn-login" id="loginBtn" onclick="doLogin()">Login</button>
+        <div class="login-error" id="loginError"></div>
+      </div>
+    </div>
+    <div class="login-footer">
+      <span>🔐 Secure Medical Platform</span>
+      <span>v2.0 • NeuroSync Labs</span>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== MAIN APP ==================== -->
+<div id="mainApp" class="main-app hidden">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-icon-sm">
+        <svg viewBox="0 0 40 40" fill="none"><path d="M5 20 L10 20 L13 10 L17 30 L21 15 L24 25 L27 20 L35 20" stroke="url(#g2)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><defs><linearGradient id="g2" x1="5" y1="20" x2="35" y2="20" gradientUnits="userSpaceOnUse"><stop stop-color="#6366f1"/><stop offset="1" stop-color="#06b6d4"/></linearGradient></defs></svg>
+      </div>
+      <span class="sidebar-brand-text">NeuroSync<b>EMG</b></span>
+      <button class="sidebar-toggle" onclick="toggleSidebar()">☰</button>
     </div>
 
-    <script src="script.js"></script>
+    <div class="sidebar-user">
+      <div class="user-avatar" id="sidebarAvatar">D</div>
+      <div class="user-info">
+        <span class="user-name" id="sidebarUserName">Dr. Admin</span>
+        <span class="user-role" id="sidebarUserRole">Doctor</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a class="nav-item active" href="#" onclick="showPage('dashboard')" id="nav-dashboard">
+        <span class="nav-icon">📊</span><span class="nav-label">Dashboard</span>
+      </a>
+      <a class="nav-item" href="#" onclick="showPage('patients')" id="nav-patients">
+        <span class="nav-icon">👥</span><span class="nav-label">Patients</span>
+      </a>
+      <a class="nav-item" href="#" onclick="showPage('monitor')" id="nav-monitor">
+        <span class="nav-icon">📡</span><span class="nav-label">Live Monitor</span>
+        <span class="nav-badge pulse">LIVE</span>
+      </a>
+      <a class="nav-item" href="#" onclick="showPage('history')" id="nav-history">
+        <span class="nav-icon">📁</span><span class="nav-label">Session History</span>
+      </a>
+      <a class="nav-item" href="#" onclick="showPage('progress')" id="nav-progress">
+        <span class="nav-icon">📈</span><span class="nav-label">Progress</span>
+      </a>
+      <a class="nav-item" href="#" onclick="showPage('alerts')" id="nav-alerts">
+        <span class="nav-icon">🚨</span><span class="nav-label">Alerts</span>
+        <span class="nav-badge alert-badge" id="alertBadge">3</span>
+      </a>
+      <a class="nav-item" href="#" onclick="showPage('report')" id="nav-report">
+        <span class="nav-icon">📋</span><span class="nav-label">Reports</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <button class="btn-logout" onclick="doLogout()">⬅ Logout</button>
+      <div class="device-status">
+        <span class="status-dot active"></span>
+        <span class="status-text">Device Connected</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="content-area" id="contentArea">
+
+    <!-- TOP BAR -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <h2 class="page-title" id="pageTitle">Dashboard</h2>
+        <span class="page-date" id="pageDate"></span>
+      </div>
+      <div class="topbar-right">
+        <div class="topbar-search">
+          <input type="text" placeholder="Search patients..." id="globalSearch" oninput="searchPatients(this.value)"/>
+          <span>🔍</span>
+        </div>
+        <div class="topbar-alerts" onclick="showPage('alerts')">
+          <span>🔔</span>
+          <span class="alert-dot" id="alertDot"></span>
+        </div>
+        <div class="topbar-user">
+          <div class="user-avatar-sm" id="topbarAvatar">D</div>
+          <span id="topbarName">Dr. Admin</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- ========== DASHBOARD PAGE ========== -->
+    <div class="page active" id="page-dashboard">
+      <div class="stats-grid">
+        <div class="stat-card" style="--accent:#6366f1">
+          <div class="stat-icon">👥</div>
+          <div class="stat-info">
+            <span class="stat-value" id="statTotalPatients">4</span>
+            <span class="stat-label">Total Patients</span>
+          </div>
+          <div class="stat-trend up">↑ 2 this week</div>
+        </div>
+        <div class="stat-card" style="--accent:#06b6d4">
+          <div class="stat-icon">📡</div>
+          <div class="stat-info">
+            <span class="stat-value" id="statActiveSessions">2</span>
+            <span class="stat-label">Active Sessions</span>
+          </div>
+          <div class="stat-trend up">↑ Live now</div>
+        </div>
+        <div class="stat-card" style="--accent:#10b981">
+          <div class="stat-icon">💪</div>
+          <div class="stat-info">
+            <span class="stat-value" id="statAvgStrength">67%</span>
+            <span class="stat-label">Avg Muscle Strength</span>
+          </div>
+          <div class="stat-trend up">↑ +5% vs last week</div>
+        </div>
+        <div class="stat-card" style="--accent:#f59e0b">
+          <div class="stat-icon">🚨</div>
+          <div class="stat-info">
+            <span class="stat-value" id="statAlerts">3</span>
+            <span class="stat-label">Active Alerts</span>
+          </div>
+          <div class="stat-trend down">↓ Needs attention</div>
+        </div>
+      </div>
+
+      <!-- Quick Live Chart + Activity -->
+      <div class="dashboard-grid">
+        <div class="dash-card chart-preview-card">
+          <div class="card-header">
+            <h3>Live EMG Signal Preview</h3>
+            <div class="live-badge"><span class="pulse-dot"></span> LIVE</div>
+          </div>
+          <canvas id="dashChart" height="130"></canvas>
+          <div class="signal-channels-mini" id="dashChannelBars"></div>
+        </div>
+
+        <div class="dash-card">
+          <div class="card-header"><h3>Gesture Detection</h3></div>
+          <div class="gesture-display" id="dashGesture">
+            <div class="gesture-icon" id="gestureIcon">✋</div>
+            <div class="gesture-name" id="gestureName">Hand at Rest</div>
+            <div class="gesture-conf" id="gestureConf">Confidence: 94%</div>
+          </div>
+          <div class="gesture-list">
+            <div class="gesture-chip active" id="gchip0">Rest</div>
+            <div class="gesture-chip" id="gchip1">Fist</div>
+            <div class="gesture-chip" id="gchip2">Flex</div>
+            <div class="gesture-chip" id="gchip3">Extend</div>
+            <div class="gesture-chip" id="gchip4">Radial</div>
+            <div class="gesture-chip" id="gchip5">Ulnar</div>
+            <div class="gesture-chip" id="gchip6">Open Palm</div>
+          </div>
+        </div>
+
+        <div class="dash-card strength-card">
+          <div class="card-header"><h3>Muscle Strength Score</h3></div>
+          <div class="strength-gauge-wrap">
+            <canvas id="gaugeCanvas" width="180" height="100"></canvas>
+            <div class="gauge-value" id="gaugeValue">67</div>
+            <div class="gauge-label" id="gaugeLabel">Moderate</div>
+          </div>
+          <div class="strength-legend">
+            <div class="legend-item"><span style="background:#ef4444"></span>0–20 Weak</div>
+            <div class="legend-item"><span style="background:#f59e0b"></span>20–60 Moderate</div>
+            <div class="legend-item"><span style="background:#10b981"></span>60–100 Strong</div>
+          </div>
+        </div>
+
+        <div class="dash-card">
+          <div class="card-header"><h3>Recent Alerts</h3></div>
+          <div class="alert-list" id="dashAlerts"></div>
+        </div>
+      </div>
+
+      <!-- Patient Quick List -->
+      <div class="dash-card full-width mt-16">
+        <div class="card-header">
+          <h3>Patients Overview</h3>
+          <button class="btn-sm" onclick="showPage('patients')">View All →</button>
+        </div>
+        <div class="patients-table-wrap">
+          <table class="patients-table" id="dashPatientTable">
+            <thead>
+              <tr><th>Patient</th><th>Condition</th><th>Strength</th><th>Last Session</th><th>Status</th><th>Action</th></tr>
+            </thead>
+            <tbody id="dashPatientTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== PATIENTS PAGE ========== -->
+    <div class="page" id="page-patients">
+      <div class="page-actions">
+        <button class="btn-primary" id="addPatientBtn" onclick="openPatientModal()">+ Add Patient</button>
+        <div class="search-wrap">
+          <input type="text" placeholder="Search patients..." id="patientSearch" oninput="filterPatients(this.value)"/>
+        </div>
+      </div>
+      <div class="patients-grid" id="patientCardsGrid"></div>
+    </div>
+
+    <!-- ========== LIVE MONITOR PAGE ========== -->
+    <div class="page" id="page-monitor">
+      <div class="monitor-controls">
+        <div class="monitor-patient-select">
+          <label>Monitoring Patient:</label>
+          <select id="monitorPatientSelect" onchange="changeMonitorPatient()">
+          </select>
+        </div>
+        <div class="monitor-btns">
+          <button class="btn-primary" id="startBtn" onclick="startMonitor()">▶ Start Session</button>
+          <button class="btn-danger" id="stopBtn" onclick="stopMonitor()" disabled>⬛ Stop</button>
+          <button class="btn-secondary" id="exportBtn" onclick="exportSession()">⬇ Export CSV</button>
+        </div>
+        <div class="session-timer" id="sessionTimer">00:00:00</div>
+      </div>
+
+      <!-- Status Row -->
+      <div class="monitor-status-row">
+        <div class="status-card" id="movStatusCard">
+          <div class="status-indicator" id="movIndicator">🟢</div>
+          <div class="status-text-block">
+            <span class="status-main" id="movStatus">Active Muscle</span>
+            <span class="status-sub">Movement Detected</span>
+          </div>
+        </div>
+        <div class="status-card">
+          <div class="status-indicator">💪</div>
+          <div class="status-text-block">
+            <span class="status-main" id="liveStrengthVal">--</span>
+            <span class="status-sub">Strength Score</span>
+          </div>
+        </div>
+        <div class="status-card">
+          <div class="status-indicator">⚡</div>
+          <div class="status-text-block">
+            <span class="status-main" id="liveRMS">--</span>
+            <span class="status-sub">RMS Amplitude (µV)</span>
+          </div>
+        </div>
+        <div class="status-card">
+          <div class="status-indicator">✋</div>
+          <div class="status-text-block">
+            <span class="status-main" id="liveGesture">--</span>
+            <span class="status-sub">Detected Gesture</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Live Chart -->
+      <div class="dash-card monitor-chart-card">
+        <div class="card-header">
+          <h3>Real-Time EMG Waveform (8 Channels)</h3>
+          <div class="chart-controls">
+            <label>Zoom:</label>
+            <input type="range" id="zoomRange" min="1" max="5" value="2" oninput="changeZoom(this.value)"/>
+            <span id="zoomLabel">2x</span>
+          </div>
+        </div>
+        <canvas id="liveChart" height="220"></canvas>
+      </div>
+
+      <!-- Channel Grid -->
+      <div class="channel-grid" id="channelGrid"></div>
+
+      <!-- AI Prediction -->
+      <div class="dash-card ai-card">
+        <div class="card-header">
+          <h3>🧠 AI-Based Analysis & Prediction</h3>
+          <span class="ai-badge">AI Active</span>
+        </div>
+        <div class="ai-grid">
+          <div class="ai-item">
+            <div class="ai-label">Recovery Trend</div>
+            <div class="ai-value" id="aiTrend">📈 Improving</div>
+            <div class="ai-sub" id="aiTrendSub">+12% over 10 days</div>
+          </div>
+          <div class="ai-item">
+            <div class="ai-label">Signal Quality</div>
+            <div class="ai-value" id="aiQuality">✅ Good</div>
+            <div class="ai-sub" id="aiQualitySub">Low noise detected</div>
+          </div>
+          <div class="ai-item">
+            <div class="ai-label">Anomaly Detection</div>
+            <div class="ai-value" id="aiAnomaly">🟢 Normal</div>
+            <div class="ai-sub" id="aiAnomalySub">No spikes detected</div>
+          </div>
+          <div class="ai-item">
+            <div class="ai-label">Predicted Recovery</div>
+            <div class="ai-value" id="aiRecovery">~28 days</div>
+            <div class="ai-sub" id="aiRecoverySub">Based on current progress</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== SESSION HISTORY PAGE ========== -->
+    <div class="page" id="page-history">
+      <div class="page-actions">
+        <div class="filter-row">
+          <select id="historyPatientFilter" onchange="filterHistory()">
+            <option value="">All Patients</option>
+          </select>
+          <input type="date" id="historyDateFilter" onchange="filterHistory()"/>
+          <button class="btn-secondary" onclick="clearHistoryFilter()">Clear Filter</button>
+        </div>
+      </div>
+      <div class="history-timeline" id="historyTimeline"></div>
+    </div>
+
+    <!-- ========== PROGRESS PAGE ========== -->
+    <div class="page" id="page-progress">
+      <div class="progress-patient-select">
+        <label>Select Patient:</label>
+        <select id="progressPatientSelect" onchange="renderProgress()">
+        </select>
+      </div>
+      <div class="progress-grid">
+        <div class="dash-card full-width">
+          <div class="card-header">
+            <h3>Muscle Strength Over Time</h3>
+          </div>
+          <canvas id="progressChart" height="200"></canvas>
+        </div>
+        <div class="dash-card">
+          <div class="card-header"><h3>Recovery Milestones</h3></div>
+          <div class="milestones" id="progressMilestones"></div>
+        </div>
+        <div class="dash-card">
+          <div class="card-header"><h3>Session Summary</h3></div>
+          <div class="progress-stats" id="progressStats"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== ALERTS PAGE ========== -->
+    <div class="page" id="page-alerts">
+      <div class="alerts-header">
+        <h3>System Alerts & Notifications</h3>
+        <button class="btn-secondary" onclick="clearAllAlerts()">Clear All</button>
+      </div>
+      <div class="alerts-container" id="alertsContainer"></div>
+    </div>
+
+    <!-- ========== REPORT PAGE ========== -->
+    <div class="page" id="page-report">
+      <div class="report-controls">
+        <select id="reportPatient">
+          <option value="">Select Patient</option>
+        </select>
+        <button class="btn-primary" onclick="generateReport()">📋 Generate Report</button>
+        <button class="btn-secondary" onclick="printReport()">🖨️ Print / PDF</button>
+      </div>
+      <div id="reportOutput" class="report-output hidden"></div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ==================== PATIENT MODAL ==================== -->
+<div id="patientModal" class="modal-overlay hidden">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3 id="modalTitle">Add New Patient</h3>
+      <button class="modal-close" onclick="closePatientModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-section-title">👤 Basic Information</div>
+      <div class="form-grid-2">
+        <div class="form-group"><label>Full Name *</label><input type="text" id="pName" placeholder="e.g. John Doe"/></div>
+        <div class="form-group"><label>Patient ID *</label><input type="text" id="pId" placeholder="e.g. EMG-2024-001"/></div>
+        <div class="form-group"><label>Age</label><input type="number" id="pAge" min="1" max="120" placeholder="Age"/></div>
+        <div class="form-group"><label>Gender</label>
+          <select id="pGender"><option>Male</option><option>Female</option><option>Other</option></select>
+        </div>
+        <div class="form-group"><label>Contact Number</label><input type="tel" id="pContact" placeholder="+91 xxxxx xxxxx"/></div>
+        <div class="form-group"><label>Email</label><input type="email" id="pEmail" placeholder="patient@email.com"/></div>
+      </div>
+
+      <div class="modal-section-title">🏥 Medical Information</div>
+      <div class="form-grid-2">
+        <div class="form-group"><label>Condition</label>
+          <select id="pCondition">
+            <option>Stroke</option><option>Paralysis</option><option>Muscle Injury</option>
+            <option>Nerve Damage</option><option>Post-Surgery</option><option>Other</option>
+          </select>
+        </div>
+        <div class="form-group"><label>Affected Muscle Area</label>
+          <select id="pMuscle">
+            <option>Forearm</option><option>Upper Arm</option><option>Shoulder</option>
+            <option>Hand</option><option>Leg</option><option>Lower Leg</option><option>Other</option>
+          </select>
+        </div>
+        <div class="form-group"><label>Doctor Name</label><input type="text" id="pDoctor" placeholder="Dr. Name"/></div>
+        <div class="form-group"><label>Severity</label>
+          <select id="pSeverity"><option>Mild</option><option>Moderate</option><option>Severe</option></select>
+        </div>
+        <div class="form-group"><label>Notes</label><textarea id="pNotes" placeholder="Additional medical notes..." rows="2"></textarea></div>
+      </div>
+
+      <div class="modal-section-title">📡 Device Information</div>
+      <div class="form-grid-2">
+        <div class="form-group"><label>Device ID</label><input type="text" id="pDeviceId" placeholder="MYO-001"/></div>
+        <div class="form-group"><label>Monitoring Started</label><input type="date" id="pStartDate"/></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closePatientModal()">Cancel</button>
+      <button class="btn-primary" onclick="savePatient()">💾 Save Patient</button>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== ALERT TOAST ==================== -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- ==================== VOICE ALERT ==================== -->
+<div id="voiceAlert" class="voice-alert hidden">
+  <span>🔊</span><span id="voiceAlertText">Alert!</span>
+</div>
+
+<script src="app.js"></script>
 </body>
 </html>
