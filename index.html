@@ -4,118 +4,60 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EMG Monitoring Dashboard</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        body {
-            background: linear-gradient(to right, #6a11cb, #2575fc);
-            color: white;
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        .patient-card {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            padding: 20px;
-            margin: 10px;
-            width: 300px;
-            text-align: center;
-        }
-        .status {
-            font-weight: bold;
-        }
-        #refresh-btn, #add-reading-btn {
-            margin-top: 20px;
-            padding: 10px 20px;
-            background-color: #44bd32;
-            border: none;
-            color: white;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        #emgChart {
-            width: 100%;
-            height: 400px;
-        }
-    </style>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <h1>EMG Monitoring Dashboard</h1>
-    <h2>Patient List</h2>
-    <div class="patient-card">
-        <h3>John Doe</h3>
-        <p>Age: 30</p>
-        <p>Condition: Stable</p>
-        <p>Admission Date: 2026-04-01</p>
-        <p class="status">Movement: Active</p>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <h1>EMG Monitoring System</h1>
+        <ul>
+            <li><a href="#">Home</a></li>
+            <li><a href="#">Reports</a></li>
+            <li><a href="#">Settings</a></li>
+        </ul>
+    </nav>
+    
+    <!-- Main Dashboard -->
+    <div class="dashboard">
+        <!-- Patient Sidebar -->
+        <aside class="patient-sidebar">
+            <h2>Patient Information</h2>
+            <div class="patient-card">
+                <p><strong>Name:</strong> John Doe</p>
+                <p><strong>Age:</strong> 30</p>
+                <p><strong>Condition:</strong> Healthy</p>
+            </div>
+        </aside>
+        
+        <!-- Real-time EMG Chart -->
+        <section class="emg-chart">
+            <h2>Real-Time EMG Data</h2>
+            <canvas id="emgCanvas"></canvas>
+        </section>
+        
+        <!-- Movement Status Indicator -->
+        <section class="movement-status">
+            <h2>Movement Status</h2>
+            <p id="movementStatus">No Movement Detected</p>
+        </section>
+        
+        <!-- Statistics Grid -->
+        <section class="statistics">
+            <h2>Statistics</h2>
+            <table>
+                <tr><th>Average</th><th>Peak</th><th>Duration</th></tr>
+                <tr><td id="averageValue">0.00</td><td id="peakValue">0.00</td><td id="durationValue">0s</td></tr>
+            </table>
+        </section>
     </div>
-    <div class="patient-card">
-        <h3>Jane Smith</h3>
-        <p>Age: 28</p>
-        <p>Condition: Under observation</p>
-        <p>Admission Date: 2026-04-02</p>
-        <p class="status">Movement: Inactive</p>
+    
+    <!-- Interactive Controls -->
+    <div class="controls">
+        <button id="refreshButton">Refresh</button>
+        <button id="addReadingButton">Add Reading</button>
+        <button id="clearDataButton">Clear Data</button>
     </div>
-    <div class="patient-card">
-        <h3>Mike Johnson</h3>
-        <p>Age: 35</p>
-        <p>Condition: Critical</p>
-        <p>Admission Date: 2026-04-03</p>
-        <p class="status">Movement: Active</p>
-    </div>
-    <button id="refresh-btn">Refresh Data</button>
-    <button id="add-reading-btn">Add Fake Reading</button>
-    <canvas id="emgChart"></canvas>
-    <script>
-        const ctx = document.getElementById('emgChart').getContext('2d');
-        let emgData = [];
 
-        function refreshData() {
-            // Simulate fetching new data
-            const newData = Math.random() * 100;
-            emgData.push(newData);
-            if (emgData.length > 20) emgData.shift(); // Keep only the last 20 readings
-            updateChart();
-        }
-
-        function updateChart() {
-            if (window.myChart) {
-                window.myChart.data.datasets[0].data = emgData;
-                window.myChart.update();
-            } else {
-                window.myChart = new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: emgData.map((_, i) => i + 1),
-                        datasets: [{
-                            label: 'EMG Data',
-                            backgroundColor: 'rgba(255, 255, 255, 0.5)',
-                            borderColor: 'rgba(255, 255, 255, 1)',
-                            data: emgData,
-                        }]
-                    },
-                    options: {
-                        scales: {
-                            y: {
-                                beginAtZero: true
-                            }
-                        }
-                    }
-                });
-            }
-        }
-
-        document.getElementById('refresh-btn').addEventListener('click', refreshData);
-        document.getElementById('add-reading-btn').addEventListener('click', () => {
-            emgData.push(Math.random() * 100);
-            updateChart();
-        });
-
-        setInterval(refreshData, 5000); // Auto-update every 5 seconds
-        refreshData(); // Initial data fetch
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>
